@@ -1,7 +1,10 @@
+import { ProxyState } from "../AppState.js"
 
 function _drawHouses(){
-  // GET THE HOUES TEMPLATE
-  document.getElementById('listings').innerHTML = '<p> houses go here </p>'
+  let template = ''
+  let houses = ProxyState.houses
+  houses.forEach(h => template += h.Template)
+  document.getElementById('listings').innerHTML = template
 }
 
 
