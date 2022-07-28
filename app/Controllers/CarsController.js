@@ -30,6 +30,9 @@ export class CarsController{
 
   viewCars(){
     _drawCars()
+    document.getElementById('form').classList.remove('d-none')
+    document.getElementById('house-form').classList.add('d-none')
+    document.getElementById('job-form').classList.add('d-none')
   }
 
   createCar(){
