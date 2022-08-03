@@ -1,5 +1,7 @@
 import { ProxyState } from "../AppState.js";
+import { getJobForm } from "../Components/JobForm.js";
 import { jobsService } from "../Services/JobsService.js";
+import { Pop } from "../Utils/Pop.js";
 
 
 function _drawJob(){
@@ -7,44 +9,79 @@ function _drawJob(){
   let jobs = ProxyState.jobs
   jobs.forEach(j => template += j.Template)
   document.getElementById("listings").innerHTML = template
+  document.getElementById('form').innerHTML = getJobForm()
 }
 
 export class JobsController{
   constructor(){
-    console.log(ProxyState.jobs, 'controller is working');
     ProxyState.on('jobs', _drawJob)
   }
   
-    viewJobs(){
-      _drawJob()
-      document.getElementById('form').classList.add('d-none')
-      document.getElementById('house-form').classList.add('d-none')
-      document.getElementById('job-form').classList.remove('d-none')
-    }
 
-
-    createJob(){
-      window.event.preventDefault()
-      let form = window.event.target
-
-      let newJob ={
-        company: form.company.value,
-        title: form.title.value,
-        location: form.location.value,
-        fulltime: form.fulltime.value,
-        salary: form.salary.value,
-        experience: form.experience.value,
-        img: form.img.value
+    async getJobs(){
+      try {
+        await jobsService.getJobs()
+      } catch (error) {
+        console.error('[get jobs]', error)
+        Pop.error(error)
       }
-
-      jobsService.createJob(newJob)
-      form.reset()
     }
 
-    deleteJob(id){
-      console.log('delete', id);
-      jobsService.deleteJob(id)
-    }
+    async createJob(){
+      try {
+        window.event.preventDefault()
+        let form = window.event.target
   
+        let newJob ={
+          company: form.company.value,
+          jobTitle: form.jobTitle.value,
+          hours: form.hours.value,
+          rate: form.rate.value,
+          description: form.description.value,
+        }
+  
+        jobsService.createJob(newJob)
+        form.reset() 
+      } catch (error) {
+        console.error('[create job]', error)
+        Pop.error(error)
+      }
+    }
+
+    async deleteJob(jobId){
+      try {
+        jobsService.deleteJob(jobId)
+        
+      } catch (error) {
+        console.error('delete job', error)
+        Pop.error(error)
+      }
+    }
+
+    adjustJob(jobId){
+      let job = ProxyState.jobs.find(j => j.id == jobId)
+      document.getElementById('job-form').innerHTML = getJobForm(job)
+    }
+
+    async editJob(jobId){
+      try {
+        window.event.preventDefault()
+        let form = window.event.target
+  
+        let jobData ={
+          id: jobId,
+          company: form.company.value,
+          jobTitle: form.jobTitle.value,
+          hours: form.hours.value,
+          rate: form.rate.value,
+          description: form.description.value,
+        }
+        await jobsService.editJob(jobData)
+        form.reset() 
+      } catch (error) {
+        console.error('[edit job]', error)
+        Pop.error(error)
+      }
+    }
 
 }

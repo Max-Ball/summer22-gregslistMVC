@@ -1,29 +1,35 @@
 import { ProxyState } from "../AppState.js";
 import { Car } from "../Models/Car.js";
+import { api } from "./AxiosService.js";
 
 
 
-// NOTE service is export as a singleton
 class CarsService{
 
-  createCar(newCar){
-    console.log('creating a car in the service', newCar);
-    // ProxyState.cars.push(new Car(newCar))
-    // NOTE the assignment method below breaks down the cars array, tacks one to the end and groups them back together
-    // NOTE the = here is what triggers our 'listeners'
-    ProxyState.cars = [...ProxyState.cars, new Car(newCar)]
-    console.log('current cars',ProxyState.cars);
+  async getCars(){
+    let res = await api.get('/cars')
+    ProxyState.cars = res.data.map(c => new Car(c))
+
   }
 
-  deleteCar(id){
-    // let carIndex = ProxyState.cars.findIndex(c => c.id == id)
-    // console.log('deleting', carIndex);
-    // ProxyState.cars.splice(carIndex, 1)
-    // console.log('car deleted', ProxyState.cars);
-    // ProxyState.cars = ProxyState.cars
-    ProxyState.cars = ProxyState.cars.filter(c => c.id != id)
+  async createCar(carFormData){
+    let res = await api.post('/cars', carFormData)
+    let car = new Car(res.data)
+    ProxyState.cars = [...ProxyState.cars, car]
   }
 
+  async deleteCar(carId){
+    await api.delete(`/cars/${carId}`)
+    ProxyState.cars = ProxyState.cars.filter(c => c.id != carId)
+  }
+
+  async editCar(carData){
+    let res = await api.put(`/cars/${carData.id}`, carData)
+    let car = new Car(res.data)
+    let carIndex = ProxyState.cars.findIndex(c => c.id == carData.id)
+    ProxyState.cars.splice(carIndex, 1, car)
+    ProxyState.cars = ProxyState.cars
+  }
 }
 
 // NOTE this is exporting as SINGLE const car service that cannot be mutated

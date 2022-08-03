@@ -1,25 +1,16 @@
-import { generateId } from '../Utils/generateId.js'
 
 
 export class Car{
-  constructor({make, model, year, price, img, description}){
-    this.id = generateId()
-    this.make = make,
-    this.model = model,
-    this.year = year, 
-    this.price = price,
-    this.img = img,
-    this.description = description
-  }
 
-  // constructor(data){
-  //   this.make = data.make,
-  //   this.model = data.model,
-  //   this.year = data.year, 
-  //   this.price = data.price,
-  //   this.img = data.img,
-  //   this.description = data.description
-  // }
+  constructor(data){
+    this.id = data.id 
+    this.make = data.make || ''
+    this.model = data.model || ''
+    this.year = data.year || 0
+    this.price = data.price || 0
+    this.img = data.imgUrl || ''
+    this.description = data.description || ''
+  }
 
   get Template(){
     return `
@@ -30,7 +21,8 @@ export class Car{
           <h4 class="text-center">${this.make} | ${this.model} | ${this.year}</h4>
           <p>${this.description}</p>
           <p class="text-end text-success m-0">$<b>${this.price}</b></p>
-          <button class="btn btn-danger" onclick="app.carsController.deleteCar('${this.id}')">delete me</button> 
+          <button class="btn btn-danger" onclick="app.carsController.deleteCar('${this.id}')">Delete Me</button> 
+          <button class="btn btn-primary" onclick="app.carsController.adjustCar('${this.id}')">Update Me</button> 
         </div>
       </div>
     </div>
